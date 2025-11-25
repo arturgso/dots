@@ -56,8 +56,8 @@ pause
 # Instalando grupos padrão
 # -------------------
 echo -e "${BLUE}Instalando grupos padrão...${NC}"
-sudo dnf group install -y "Development Tools"
-sudo dnf group install -y Multimedia
+sudo dnf group install -y development-tools
+sudo dnf group install -y multimedia
 pause
 
 echo -e "${GREEN}Grupos instalados${NC}"
@@ -73,7 +73,7 @@ ESSENTIAL_PACKAGES=(
   gdbm-devel sqlite-devel ncurses-devel make gcc autoconf automake libtool pkgconfig
   mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
   dunst neovim mousepad nwg-look rofi bat cloc git zsh
-  pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon sddm flatpak
+  pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon flatpak docker
 )
 
 echo -e "${BLUE}Instalando pacotes essenciais...${NC}"
@@ -91,9 +91,9 @@ for pkg in "${ESSENTIAL_PACKAGES[@]}"; do
 pause
 
 # -------------------
-# Habilitando serviços essenciais
+# Habilitando serviços essenciais (exceto SDDM)
 # -------------------
-ESSENTIAL_SERVICES=(pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon sddm)
+ESSENTIAL_SERVICES=(pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon)
 
 echo -e "${BLUE}Habilitando serviços essenciais...${NC}"
 for svc in "${ESSENTIAL_SERVICES[@]}"; do
@@ -118,16 +118,21 @@ pause
 # -------------------
 # Instalando Nerd Fonts via GitHub
 # -------------------
-echo -e "${BLUE}Instalando Nerd Fonts...${NC}"
-NERD_FONTS_URL="https://codeload.github.com/ryanoasis/nerd-fonts/zip/refs/heads/master"
-curl -L -o nerd-fonts.zip "$NERD_FONTS_URL"
-unzip nerd-fonts.zip -d nerd-fonts
-(cd nerd-fonts && ./install.sh)
-rm -rf nerd-fonts nerd-fonts.zip
-pause
-
-echo -e "${GREEN}Nerd Fonts instaladas${NC}"
-pause
+read -p "Deseja instalar as Nerd Fonts? (s/N): " install_fonts
+if [[ "$install_fonts" =~ ^[Ss]$ ]]; then
+    echo -e "${BLUE}Instalando Nerd Fonts...${NC}"
+    NERD_FONTS_URL="https://codeload.github.com/ryanoasis/nerd-fonts/zip/refs/heads/master"
+    curl -L -o nerd-fonts.zip "$NERD_FONTS_URL"
+    unzip nerd-fonts.zip -d nerd-fonts
+    (cd nerd-fonts && ./install.sh)
+    rm -rf nerd-fonts nerd-fonts.zip
+    pause
+    echo -e "${GREEN}Nerd Fonts instaladas${NC}"
+    pause
+else
+    echo -e "${YELLOW}Pular instalação das Nerd Fonts${NC}"
+    pause
+fi
 
 # -------------------
 # Instalando Flatpaks
@@ -185,4 +190,15 @@ for folder in niri waybar dunst; do
     pause
   fi
  done
+
+# -------------------
+# Habilitar SDDM após confirmação do usuário
+# -------------------
+read -p "Deseja habilitar e iniciar o SDDM agora? (s/N): " enable_sddm
+if [[ "$enable_sddm" =~ ^[Ss]$ ]]; then
+    sudo systemctl enable sddm --now
+    echo -e "${GREEN}SDDM habilitado e iniciado${NC}"
+else
+    echo -e "${YELLOW}SDDM não será habilitado neste momento${NC}"
+fi
 
