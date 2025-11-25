@@ -15,8 +15,6 @@ echo "
 set -u
 IFS=$'\n'
 
-#!/usr/bin/env bash
-
 # Funções de cores
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -75,6 +73,7 @@ ESSENTIAL_PACKAGES=(
   gdbm-devel sqlite-devel ncurses-devel make gcc autoconf automake libtool pkgconfig
   mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
   dunst neovim mousepad nwg-look rofi bat cloc git zsh
+  pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon sddm flatpak
 )
 
 echo -e "${BLUE}Instalando pacotes essenciais...${NC}"
@@ -88,20 +87,20 @@ for pkg in "${ESSENTIAL_PACKAGES[@]}"; do
   fi
   sudo dnf install -y "$pkg"
   pause
-done
+ done
 pause
 
 # -------------------
-# Serviços essenciais
+# Habilitando serviços essenciais
 # -------------------
-ESSENTIAL_SERVICES=(pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon)
+ESSENTIAL_SERVICES=(pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon sddm)
 
 echo -e "${BLUE}Habilitando serviços essenciais...${NC}"
 for svc in "${ESSENTIAL_SERVICES[@]}"; do
   sudo systemctl enable "$svc" --now
   echo -e "${GREEN}$svc habilitado e iniciado${NC}"
   pause
-done
+ done
 
 # -------------------
 # Instalando Docker
@@ -161,7 +160,7 @@ FLATPAKS=(
   org.mozilla.Thunderbird
   org.onlyoffice.desktopeditors
   org.prismlauncher.PrismLauncher
-  org.qbittorrent.qBittorrent
+  org.qbittorrent.QBittorrent
   org.videolan.VLC
   rest.insomnia.Insomnia
 )
@@ -170,7 +169,20 @@ for fpk in "${FLATPAKS[@]}"; do
     echo -e "Instalando Flatpak: ${YELLOW}$fpk${NC}"
     flatpak install -y flathub "$fpk"
     pause
-
-done
+ done
 pause
+
+# -------------------
+# Criando links simbólicos para configs
+# -------------------
+CONFIG_DIR="$HOME/.config"
+mkdir -p "$CONFIG_DIR"
+
+for folder in niri waybar dunst; do
+  if [ -d "$folder" ]; then
+    ln -sfn "$(pwd)/$folder" "$CONFIG_DIR/$folder"
+    echo -e "${GREEN}Link simbólico criado para $folder${NC}"
+    pause
+  fi
+ done
 
