@@ -46,26 +46,40 @@ SKIPPED=()
 INSTALLED=()
 
 # -------------------
-# Funções utilitárias
+# Variáveis dinâmicas de terminal
 # -------------------
+rows=0
+cols=0
 
-# Desenha/atualiza a barra fixa no rodapé
-progress_bar() {
+update_dims() {
+  # Atualiza dimensões; usa valores padrão caso tput falhe
+  rows=$(tput lines 2>/dev/null || echo 24)
+  cols=$(tput cols 2>/dev/null || echo 80)
+}
+
+# -------------------
+# Barra fixa no rodapé
+# -------------------
+draw_progress() {
   local done=$1
   local total=$2
-  local cols
-  cols=$(tput cols 2>/dev/null || echo 80)
 
+  update_dims
+
+  # cálculo do percent
   local percent=0
   if [ "$total" -gt 0 ]; then
     percent=$(( 100 * done / total ))
   fi
 
-  # Espaço reservado para texto ao redor da barra
-  local meta=" %3d%% (%d/%d) "
-  local meta_len
-  meta_len=$(printf "$meta" "$percent" "$done" "$total" | wc -c)
-  local bar_size=$(( cols - meta_len - 10 ))
+  # espaço para meta (ex: " 100% (12/12) ")
+  local meta
+  meta=$(printf " %3d%% (%d/%d) " "$percent" "$done" "$total")
+  local meta_len=${#meta}
+
+  # tamanho da barra baseado na largura
+  local reserved=12   # margem de segurança
+  local bar_size=$(( cols - meta_len - reserved ))
   [ $bar_size -lt 10 ] && bar_size=10
 
   local filled=0
@@ -74,67 +88,93 @@ progress_bar() {
   fi
   local empty=$(( bar_size - filled ))
 
-  # Preparar strings
+  # montar strings (usando printf para evitar problemas com seq em alguns ttys)
   local bar_filled
-  bar_filled="$(printf "%0.s#" $(seq 1 $filled) 2>/dev/null)"
+  if [ "$filled" -gt 0 ]; then
+    bar_filled=$(printf '%*s' "$filled" '' | tr ' ' '#')
+  else
+    bar_filled=""
+  fi
   local bar_empty
-  bar_empty="$(printf "%0.s " $(seq 1 $empty) 2>/dev/null)"
+  if [ "$empty" -gt 0 ]; then
+    bar_empty=$(printf '%*s' "$empty" '' )
+  else
+    bar_empty=""
+  fi
 
-  # Salva cursor, vai para a última linha, limpa a linha, imprime a barra e restaura cursor
+  # salva cursor, vai para última linha, limpa e imprime barra, restaura cursor
   tput sc
-  tput cup $(( $(tput lines) - 1 )) 0
-  tput el               # clear line
-  printf "Progresso: [%s%s] %3d%% (%d/%d)" "$bar_filled" "$bar_empty" "$percent" "$done" "$total"
+  tput cup $(( rows - 1 )) 0
+  tput el
+  printf "Progresso: [%s%s]%s" "$bar_filled" "$bar_empty" "$meta"
+  # preenche até o final se necessário
+  local printed_len=$(( 11 + ${#bar_filled} + ${#bar_empty} + meta_len ))
+  if [ $printed_len -lt $cols ]; then
+    printf "%*s" $(( cols - printed_len )) ""
+  fi
   tput rc
 }
 
-# Função que instala um pacote e registra resultado.
-# OBS: imprime mensagens normalmente (acima da barra) e a barra é redesenhada sempre que chamamos progress_bar.
+# Redesenha a barra quando o terminal for redimensionado
+on_resize() {
+  update_dims
+  draw_progress "$CURRENT" "$TOTAL"
+}
+trap 'on_resize' SIGWINCH
+
+# -------------------
+# Função de instalação por pacote
+# -------------------
 install_pkg() {
   local pkg=$1
 
-  # Checa se já instalado
+  # Se já instalado
   if rpm -q "$pkg" &>/dev/null; then
     echo "✔ $pkg já instalado" | tee -a "$LOGFILE"
     SKIPPED+=("$pkg")
+    # redesenha barra após a mensagem
+    draw_progress "$CURRENT" "$TOTAL"
     return 0
   fi
 
-  # Mensagem inicial (aparece acima da barra)
+  # Mensagem inicial
   echo "→ Instalando: $pkg" | tee -a "$LOGFILE"
-  progress_bar "$CURRENT" "$TOTAL"
+  draw_progress "$CURRENT" "$TOTAL"
 
-  # Executa instalação (saída no log)
+  # Executa a instalação com saída somente para log
   if sudo dnf install -y "$pkg" >>"$LOGFILE" 2>&1; then
     echo "  ✓ Sucesso: $pkg" | tee -a "$LOGFILE"
     INSTALLED+=("$pkg")
-    progress_bar "$CURRENT" "$TOTAL"
+    draw_progress "$CURRENT" "$TOTAL"
     return 0
   else
     echo "  ✖ Falhou: $pkg (ver $LOGFILE)" | tee -a "$LOGFILE"
     FAILED+=("$pkg")
-    progress_bar "$CURRENT" "$TOTAL"
+    draw_progress "$CURRENT" "$TOTAL"
     return 1
   fi
 }
 
 # -------------------
-# Preparação e keepalive do sudo
+# Preparação: sudo keepalive
 # -------------------
-sudo -v
+sudo -v || { echo "sudo sem sucesso. Verifique permissões." ; exit 1; }
 ( while true; do sudo -v; sleep 60; done ) 2>/dev/null &
 SUDO_KEEPALIVE_PID=$!
 
 cleanup() {
+  # remove background keepalive
   kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
-  # garante que a barra final foi desenhada corretamente e pule uma linha
-  tput cup $(( $(tput lines) - 1 )) 0
+  # garante que a barra seja reposicionada e pula linha para o resumo
+  update_dims
+  tput cup $(( rows - 1 )) 0
+  tput el
   echo
 }
 trap cleanup EXIT
 
 # -------------------
-# Prepara log e lista única (remove duplicatas preservando ordem)
+# Prepara log, une listas e remove duplicatas (preserva ordem)
 # -------------------
 : > "$LOGFILE"
 
@@ -142,6 +182,8 @@ ALL=( "${DEV_PKGS[@]}" "${FONTS[@]}" "${DESKTOP[@]}" )
 uniq_list=()
 declare -A seen
 for p in "${ALL[@]}"; do
+  # pula entradas vazias (caso)
+  [ -z "$p" ] && continue
   if [ -z "${seen[$p]:-}" ]; then
     uniq_list+=("$p")
     seen[$p]=1
@@ -151,25 +193,26 @@ done
 TOTAL=${#uniq_list[@]}
 CURRENT=0
 
-# Desenha barra inicial (0%)
-progress_bar "$CURRENT" "$TOTAL"
+# Desenha barra inicial
+update_dims
+draw_progress "$CURRENT" "$TOTAL"
 
 echo "== Iniciando instalações ($TOTAL pacotes) ==" | tee -a "$LOGFILE"
-# Re-desenha a barra logo após o cabeçalho
-progress_bar "$CURRENT" "$TOTAL"
+draw_progress "$CURRENT" "$TOTAL"
 
 # -------------------
-# Loop de instalação: imprime mensagens normalmente; barra é re-desenhada para ficar fixa no rodapé
+# Loop principal: atualiza barra antes/depois e instala pacote a pacote
 # -------------------
 for pkg in "${uniq_list[@]}"; do
-  CURRENT=$((CURRENT + 1))
-  progress_bar "$CURRENT" "$TOTAL"   # atualiza antes de iniciar instalação (opcional)
+  CURRENT=$(( CURRENT + 1 ))
+  # atualiza barra antes de tentar instalar (mostra progresso visual)
+  draw_progress "$CURRENT" "$TOTAL"
   install_pkg "$pkg"
 done
 
 # barra final 100%
-progress_bar "$TOTAL" "$TOTAL"
-echo    # pula linha para o resumo
+draw_progress "$TOTAL" "$TOTAL"
+echo    # pula linha para imprimir o resumo
 
 # -------------------
 # Resumo final
