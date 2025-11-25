@@ -12,10 +12,13 @@ echo "
                                                                                                            ▀         ▀         "
 
 
-#Adicionar copr
+set -u
+IFS=$'\n'
 
-echo "Adicionado Copr necessários"
-
+# -------------------
+# Adicionar copr
+# -------------------
+echo "Adicionando Copr necessários"
 sudo dnf copr enable solopasha/hyprland -y
 echo "Copr's habilitados"
 
@@ -52,7 +55,6 @@ rows=0
 cols=0
 
 update_dims() {
-  # Atualiza dimensões; usa valores padrão caso tput falhe
   rows=$(tput lines 2>/dev/null || echo 24)
   cols=$(tput cols 2>/dev/null || echo 80)
 }
@@ -61,58 +63,53 @@ update_dims() {
 # Barra fixa no rodapé
 # -------------------
 draw_progress() {
-  local done=$1
-  local total=$2
+    local done=${1:-0}
+    local total=${2:-0}
 
-  update_dims
+    update_dims
 
-  # cálculo do percent
-  local percent=0
-  if [ "$total" -gt 0 ]; then
-    percent=$(( 100 * done / total ))
-  fi
+    # evita divisão por zero
+    local percent=0
+    if [ "$total" -gt 0 ]; then
+      percent=$(( 100 * done / total ))
+    fi
 
-  # espaço para meta (ex: " 100% (12/12) ")
-  local meta
-  meta=$(printf " %3d%% (%d/%d) " "$percent" "$done" "$total")
-  local meta_len=${#meta}
+    local meta
+    meta=$(printf " %3d%% (%d/%d) " "$percent" "$done" "$total")
+    local meta_len=${#meta}
 
-  # tamanho da barra baseado na largura
-  local reserved=12   # margem de segurança
-  local bar_size=$(( cols - meta_len - reserved ))
-  [ $bar_size -lt 10 ] && bar_size=10
+    local reserved=12
+    local bar_size=$(( cols - meta_len - reserved ))
+    [ $bar_size -lt 10 ] && bar_size=10
 
-  local filled=0
-  if [ "$total" -gt 0 ]; then
-    filled=$(( bar_size * done / total ))
-  fi
-  local empty=$(( bar_size - filled ))
+    local filled=0
+    if [ "$total" -gt 0 ]; then
+      filled=$(( bar_size * done / total ))
+    fi
+    local empty=$(( bar_size - filled ))
 
-  # montar strings (usando printf para evitar problemas com seq em alguns ttys)
-  local bar_filled
-  if [ "$filled" -gt 0 ]; then
-    bar_filled=$(printf '%*s' "$filled" '' | tr ' ' '#')
-  else
-    bar_filled=""
-  fi
-  local bar_empty
-  if [ "$empty" -gt 0 ]; then
-    bar_empty=$(printf '%*s' "$empty" '' )
-  else
-    bar_empty=""
-  fi
+    local bar_filled=""
+    local bar_empty=""
+    if [ "$filled" -gt 0 ]; then
+      bar_filled=$(printf '%*s' "$filled" '' | tr ' ' '#')
+    fi
+    if [ "$empty" -gt 0 ]; then
+      bar_empty=$(printf '%*s' "$empty" '' )
+    fi
 
-  # salva cursor, vai para última linha, limpa e imprime barra, restaura cursor
-  tput sc
-  tput cup $(( rows - 1 )) 0
-  tput el
-  printf "Progresso: [%s%s]%s" "$bar_filled" "$bar_empty" "$meta"
-  # preenche até o final se necessário
-  local printed_len=$(( 11 + ${#bar_filled} + ${#bar_empty} + meta_len ))
-  if [ $printed_len -lt $cols ]; then
-    printf "%*s" $(( cols - printed_len )) ""
-  fi
-  tput rc
+    # salva cursor, vai pra última linha, limpa e imprime, restaura cursor
+    tput sc
+    tput cup $(( rows - 1 )) 0
+    printf "\033[2K"    # clear entire line
+    printf "Progresso: [%s%s]%s" "$bar_filled" "$bar_empty" "$meta"
+
+    # preencher resto até o final da coluna para evitar restos de linhas antigas
+    local printed_len=$(( 11 + ${#bar_filled} + ${#bar_empty} + meta_len ))
+    if [ $printed_len -lt $cols ]; then
+      printf "%*s" $(( cols - printed_len )) ""
+    fi
+
+    tput rc
 }
 
 # Redesenha a barra quando o terminal for redimensionado
@@ -126,33 +123,33 @@ trap 'on_resize' SIGWINCH
 # Função de instalação por pacote
 # -------------------
 install_pkg() {
-  local pkg=$1
+    local pkg="$1"
 
-  # Se já instalado
-  if rpm -q "$pkg" &>/dev/null; then
-    echo "✔ $pkg já instalado" | tee -a "$LOGFILE"
-    SKIPPED+=("$pkg")
-    # redesenha barra após a mensagem
+    # redesenha antes de imprimir (mantém a barra fixa)
     draw_progress "$CURRENT" "$TOTAL"
-    return 0
-  fi
 
-  # Mensagem inicial
-  echo "→ Instalando: $pkg" | tee -a "$LOGFILE"
-  draw_progress "$CURRENT" "$TOTAL"
+    # checa se já instalado
+    if rpm -q "$pkg" &>/dev/null; then
+      echo "✔ $pkg já instalado" | tee -a "$LOGFILE"
+      SKIPPED+=("$pkg")
+      draw_progress "$CURRENT" "$TOTAL"
+      return 0
+    fi
 
-  # Executa a instalação com saída somente para log
-  if sudo dnf install -y "$pkg" >>"$LOGFILE" 2>&1; then
-    echo "  ✓ Sucesso: $pkg" | tee -a "$LOGFILE"
-    INSTALLED+=("$pkg")
-    draw_progress "$CURRENT" "$TOTAL"
-    return 0
-  else
-    echo "  ✖ Falhou: $pkg (ver $LOGFILE)" | tee -a "$LOGFILE"
-    FAILED+=("$pkg")
-    draw_progress "$CURRENT" "$TOTAL"
-    return 1
-  fi
+    echo "→ Instalando: $pkg" | tee -a "$LOGFILE"
+
+    # executa instalação com saída só para log (append)
+    if sudo dnf install -y "$pkg" >>"$LOGFILE" 2>&1; then
+      echo "  ✓ Sucesso: $pkg" | tee -a "$LOGFILE"
+      INSTALLED+=("$pkg")
+      draw_progress "$CURRENT" "$TOTAL"
+      return 0
+    else
+      echo "  ✗ Falhou:  $pkg (ver $LOGFILE)" | tee -a "$LOGFILE"
+      FAILED+=("$pkg")
+      draw_progress "$CURRENT" "$TOTAL"
+      return 1
+    fi
 }
 
 # -------------------
@@ -163,9 +160,7 @@ sudo -v || { echo "sudo sem sucesso. Verifique permissões." ; exit 1; }
 SUDO_KEEPALIVE_PID=$!
 
 cleanup() {
-  # remove background keepalive
   kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
-  # garante que a barra seja reposicionada e pula linha para o resumo
   update_dims
   tput cup $(( rows - 1 )) 0
   tput el
@@ -182,7 +177,6 @@ ALL=( "${DEV_PKGS[@]}" "${FONTS[@]}" "${DESKTOP[@]}" )
 uniq_list=()
 declare -A seen
 for p in "${ALL[@]}"; do
-  # pula entradas vazias (caso)
   [ -z "$p" ] && continue
   if [ -z "${seen[$p]:-}" ]; then
     uniq_list+=("$p")
@@ -205,14 +199,13 @@ draw_progress "$CURRENT" "$TOTAL"
 # -------------------
 for pkg in "${uniq_list[@]}"; do
   CURRENT=$(( CURRENT + 1 ))
-  # atualiza barra antes de tentar instalar (mostra progresso visual)
   draw_progress "$CURRENT" "$TOTAL"
   install_pkg "$pkg"
 done
 
 # barra final 100%
 draw_progress "$TOTAL" "$TOTAL"
-echo    # pula linha para imprimir o resumo
+echo
 
 # -------------------
 # Resumo final
@@ -236,3 +229,4 @@ else
 fi
 
 exit 0
+
