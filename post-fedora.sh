@@ -312,10 +312,11 @@ if confirm_step "Deseja configurar o backup com Borg?"; then
         ".default.png" \
         ".zshrc" \
         ".gitconfig" \
+        ".tool-versions" \
         ".wakatime.cfg"; do
         if [ -e "$BACKUP_BASE/$item" ]; then
             echo -e "${GREEN}Copiando $item...${NC}"
-            rsync -av --progress "$BACKUP_BASE/$item" "$HOME/"
+            rsync -av --progress --exclude='node_modules' "$BACKUP_BASE/$item" "$HOME/"
         else
             echo -e "${YELLOW}Aviso: $item não encontrado no backup${NC}"
         fi
@@ -336,5 +337,87 @@ if confirm_step "Deseja configurar o backup com Borg?"; then
     unset BORG_PASSPHRASE
 
     echo -e "${GREEN}Backup Borg restaurado com sucesso!${NC}"
+    pause
+fi
+
+# -------------------
+# Instalação do asdf
+# -------------------
+if confirm_step "Deseja instalar o asdf e configurar as linguagens?"; then
+    # 1. Trocar o shell para zsh
+    echo -e "${BLUE}Trocando o shell para zsh...${NC}"
+    chsh -s $(which zsh) || {
+        echo -e "${RED}Falha ao trocar o shell para zsh${NC}"
+        pause
+        exit 1
+    }
+
+    # 2. Baixar o asdf
+    echo -e "${BLUE}Baixando o asdf...${NC}"
+    wget https://github.com/asdf-vm/asdf/releases/download/v0.18.0/asdf-v0.18.0-linux-amd64.tar.gz -O /tmp/asdf.tar.gz || {
+        echo -e "${RED}Falha ao baixar o asdf${NC}"
+        pause
+        exit 1
+    }
+
+    # 3. Extrair e mover para /bin (com sudo)
+    echo -e "${BLUE}Extraindo e movendo o asdf para /bin...${NC}"
+    sudo tar -xzf /tmp/asdf.tar.gz -C /bin || {
+        echo -e "${RED}Falha ao extrair o asdf${NC}"
+        pause
+        exit 1
+    }
+
+    # 4. Criar as pastas e configurar completions
+    echo -e "${BLUE}Configurando o asdf...${NC}"
+    mkdir -p "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+    asdf completion zsh > "${ASDF_DATA_DIR:-$HOME/.asdf}/completions/_asdf" || {
+        echo -e "${RED}Falha ao configurar as completions do asdf${NC}"
+        pause
+        exit 1
+    }
+
+    # 5. Adicionar os plugins
+    echo -e "${BLUE}Adicionando plugins do asdf...${NC}"
+    plugins=("java" "nodejs" "golang" "yarn" "rust" "neovim" "ruby" "python" "lazygit" "lazydocker")
+    for plugin in "${plugins[@]}"; do
+        asdf plugin add "$plugin" || {
+            echo -e "${RED}Falha ao adicionar o plugin $plugin${NC}"
+            pause
+            exit 1
+        }
+    done
+
+    # 6. Definir as versões globais
+    echo -e "${BLUE}Definindo versões globais...${NC}"
+    asdf set -u java temurin-25.0.0+36.0.LTS
+    asdf set -u nodejs 22.15.0
+    asdf set -u golang 1.25.1
+    asdf set -u yarn 1.22.22
+    asdf set -u rust stable
+    asdf set -u lazygit 0.55.1
+    asdf set -u neovim 0.10.0
+    asdf set -u lazydocker 0.24.1
+    asdf set -u nvim 0.10.0
+    asdf set -u ruby 3.4.7
+    asdf set -u python 3.11.14
+
+    # 7. Instalar todas as versões
+    echo -e "${BLUE}Instalando todas as versões...${NC}"
+    asdf install || {
+        echo -e "${RED}Falha ao instalar as versões com asdf${NC}"
+        pause
+        exit 1
+    }
+
+    # 8. Configurar o rustup
+    echo -e "${BLUE}Configurando o rustup...${NC}"
+    rustup default stable || {
+        echo -e "${RED}Falha ao configurar o rustup${NC}"
+        pause
+        exit 1
+    }
+
+    echo -e "${GREEN}asdf e linguagens configuradas com sucesso!${NC}"
     pause
 fi
