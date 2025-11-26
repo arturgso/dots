@@ -165,7 +165,7 @@ install_essential_packages() {
       mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
       dunst neovim mousepad nwg-look rofi bat cloc git zsh
       bluez bluez-tools power-profiles-daemon flatpak borg sddm
-      rsync wget curl
+      rsync wget curl nemo
     )
     
     update_status 1 1 "Instalando ${#packages[@]} pacotes essenciais"
@@ -352,7 +352,7 @@ configure_borg_backup() {
         ".fonts" ".var" "Projetos" ".wakatime" ".ssh" "Cofre" 
         "Documents" "Pictures" "Postman" "Scripts" "Vault" "Videos" 
         ".oh-my-zsh" ".themes" ".icons" ".default.png" ".zshrc" 
-        ".gitconfig" ".tool-versions" ".wakatime.cfg"
+        ".gitconfig" ".tool-versions" ".wakatime.cfg" ".config"
     )
     local total_items=${#items[@]}
 
