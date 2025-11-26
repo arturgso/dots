@@ -13,11 +13,11 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +0 ~/.config/systemd/user/battery-monitor.service
+badd +169 post-fedora.sh
 argglobal
 %argdel
-$argadd ~/.config/systemd/user/battery-monitor.service
-edit ~/.config/systemd/user/battery-monitor.service
+$argadd post-fedora.sh
+edit post-fedora.sh
 argglobal
 setlocal fdm=manual
 setlocal fde=
@@ -29,12 +29,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 8 - ((7 * winheight(0) + 23) / 47)
+let s:l = 169 - ((33 * winheight(0) + 24) / 48)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 8
-normal! 030|
+keepjumps 169
+normal! 059|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
@@ -48,7 +48,6 @@ if filereadable(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

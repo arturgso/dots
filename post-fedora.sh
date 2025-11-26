@@ -165,7 +165,8 @@ install_essential_packages() {
       mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
       dunst neovim mousepad nwg-look rofi bat cloc git zsh
       bluez bluez-tools power-profiles-daemon flatpak borg sddm
-      rsync wget curl nemo
+      rsync wget curl nemo firefox wayland-protocols-devel wayland-devel pkgconf-pkg-config
+      wlroots ostree libappstream-glib brightnessctl gthumb
     )
     
     update_status 1 1 "Instalando ${#packages[@]} pacotes essenciais"

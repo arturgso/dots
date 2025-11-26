@@ -68,7 +68,8 @@ run_cmd() {
       systemctl suspend
       ;;
     --logout)
-      hyprctl dispatch exit 0
+      # hyprctl dispatch exit 0
+      niri msg action quit
       ;;
     esac
   else

@@ -15,4 +15,4 @@
 
 /* Import color-scheme from `colors` directory */
 
-@import "$HOME/.dots/rofi/colors/dracula.rasi"
+@import ".dots/rofi/colors/spacegreen.rasi"
