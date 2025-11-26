@@ -51,7 +51,7 @@ if confirm_step "Deseja atualizar o sistema agora?"; then
 fi
 
 # -------------------
-# Adicionando Copr, RPM Fusion, Docker Repo e Code
+# Adicionando Copr, RPM Fusion, Repo e Code
 # -------------------
 if confirm_step "Deseja adicionar Copr, RPM Fusion e repositório do Docker?"; then
     echo -e "${BLUE}Adicionando Copr e RPM Fusion...${NC}"
@@ -64,10 +64,6 @@ if confirm_step "Deseja adicionar Copr, RPM Fusion e repositório do Docker?"; t
     sudo dnf install -y rpmfusion-free-release-43.noarch.rpm rpmfusion-nonfree-release-43.noarch.rpm
     rm -f rpmfusion-*-release-43.noarch.rpm
     pause
-
-    echo -e "${BLUE}Configurando repositório do Docker...${NC}"
-    sudo dnf -y install dnf-plugins-core
-    sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
 
     echo -e "${BLUE}Configurando repositório do VS Code...${NC}"
     sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -102,7 +98,7 @@ ESSENTIAL_PACKAGES=(
   mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
   dunst neovim mousepad nwg-look rofi bat cloc git zsh
   pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon flatpak borg sddm
-  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin rsync wget curl
+  rsync wget curl
 )
 
 # Pergunta única para instalação de todos os pacotes essenciais
@@ -420,7 +416,7 @@ fi
 if confirm_step "Deseja clonar e configurar o repositório docker-files?"; then
     echo -e "${BLUE}Clonando repositório docker-files...${NC}"
     
-    DOCKER_FILES_DIR="$HOME/docker-files"
+    DOCKER_FILES_DIR="$HOME/Docker"
     
     if [ -d "$DOCKER_FILES_DIR" ]; then
         echo -e "${YELLOW}O diretório $DOCKER_FILES_DIR já existe. Atualizando...${NC}"
