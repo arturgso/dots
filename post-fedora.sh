@@ -410,14 +410,6 @@ if confirm_step "Deseja instalar o asdf e configurar as linguagens?"; then
         exit 1
     }
 
-    # 8. Configurar o rustup
-    echo -e "${BLUE}Configurando o rustup...${NC}"
-    rustup default stable || {
-        echo -e "${RED}Falha ao configurar o rustup${NC}"
-        pause
-        exit 1
-    }
-
     echo -e "${GREEN}asdf e linguagens configuradas com sucesso!${NC}"
     pause
 fi
