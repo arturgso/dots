@@ -204,39 +204,44 @@ if confirm_step "Deseja habilitar e iniciar o SDDM?"; then
 fi
 
 # -------------------
-# Borg Backup
+# Configuração do Borg Backup
 # -------------------
 if confirm_step "Deseja configurar o backup com Borg?"; then
     echo -e "${BLUE}Listando dispositivos disponíveis...${NC}"
     lsblk
-    read -p "Digite o dispositivo a ser usado para o backup (ex: /dev/sdX): " backup_disk
+    read -p "Digite o dispositivo a ser usado para o backup (ex: /dev/sda3): " BACKUP_DISK
 
-    # Criar ponto de montagem temporário gravável no home
     MOUNT_DIR="$HOME/backup_borg_mount"
     mkdir -p "$MOUNT_DIR"
-    sudo mount "$backup_disk" "$MOUNT_DIR" || { echo -e "${RED}Falha ao montar o disco${NC}"; exit 1; }
+    echo -e "${BLUE}Montando disco e configurando Borg...${NC}"
+    sudo mount "$BACKUP_DISK" "$MOUNT_DIR"
 
-    read -sp "Digite a senha de encriptação do Borg: " BORG_PASS
-    echo
+    read -s -p "Digite a senha de encriptação do Borg: " BORG_PASS
     export BORG_PASSPHRASE="$BORG_PASS"
 
-    REPO_PATH="$MOUNT_DIR/backup-fedora-mriya"
-    borg mount "$REPO_PATH" "$MOUNT_DIR/borg_repo_mount" || { echo -e "${RED}Falha ao montar o repositório Borg${NC}"; exit 1; }
+    echo -e "${BLUE}Montando repositório Borg...${NC}"
+    borg mount "$MOUNT_DIR/backup-fedora-mriya" "$MOUNT_DIR/borg_repo_mount" || echo -e "${RED}Falha ao montar o repositório Borg${NC}"
 
-    ITEMS=(.var Projetos .wakatime .ssh Cofre Documents Pictures Postman Scripts Vault Videos .oh-my-zsh .themes .icons .default.png .zshrc .gitconfig .wakatime.cfg)
-    for item in "${ITEMS[@]}"; do
-        src="$MOUNT_DIR/borg_repo_mount/$item"
-        dest="$HOME/$item"
-        if [ -e "$src" ]; then
-            cp -r "$src" "$dest"
-            echo -e "${GREEN}Restaurado $item para $dest${NC}"
-            pause
-        fi
-    done
+    echo -e "${BLUE}Copiando pastas e arquivos do backup para o home...${NC}"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.var" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Projetos" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.wakatime" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.ssh" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Cofre" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Documents" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Pictures" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Postman" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Scripts" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Vault" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/Videos" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.oh-my-zsh" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.themes" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.icons" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.default.png" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.zshrc" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.gitconfig" "$HOME/"
+    rsync -av --progress "$MOUNT_DIR/borg_repo_mount/.wakatime.cfg" "$HOME/"
 
-    borg umount "$MOUNT_DIR/borg_repo_mount"
-    sudo umount "$MOUNT_DIR"
-    rmdir "$MOUNT_DIR"
-    echo -e "${GREEN}Backup restaurado com sucesso${NC}"
+    echo -e "${GREEN}Backup Borg restaurado${NC}"
+    pause
 fi
-
