@@ -102,7 +102,7 @@ ESSENTIAL_PACKAGES=(
   mscore-fonts-all blueman niri hyprlock hypridle hyprpicker hyprshot waybar fastfetch kitty code
   dunst neovim mousepad nwg-look rofi bat cloc git zsh
   pipewire pipewire-pulseaudio pulseaudio bluetooth power-profiles-daemon flatpak borg sddm
-  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin rsync
+  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin rsync wget curl
 )
 
 # Pergunta única para instalação de todos os pacotes essenciais
@@ -419,5 +419,50 @@ if confirm_step "Deseja instalar o asdf e configurar as linguagens?"; then
     }
 
     echo -e "${GREEN}asdf e linguagens configuradas com sucesso!${NC}"
+    pause
+fi
+
+# -------------------
+# Clonar e executar docker-files
+# -------------------
+if confirm_step "Deseja clonar e configurar o repositório docker-files?"; then
+    echo -e "${BLUE}Clonando repositório docker-files...${NC}"
+    
+    DOCKER_FILES_DIR="$HOME/docker-files"
+    
+    if [ -d "$DOCKER_FILES_DIR" ]; then
+        echo -e "${YELLOW}O diretório $DOCKER_FILES_DIR já existe. Atualizando...${NC}"
+        cd "$DOCKER_FILES_DIR"
+        git pull origin main || {
+            echo -e "${YELLOW}Falha ao atualizar. Tentando clonar novamente...${NC}"
+            cd ..
+            rm -rf "$DOCKER_FILES_DIR"
+            git clone https://github.com/arturgso/docker-files.git "$DOCKER_FILES_DIR"
+        }
+    else
+        git clone https://github.com/arturgso/docker-files.git "$DOCKER_FILES_DIR"
+    fi
+    
+    if [ $? -eq 0 ] && [ -d "$DOCKER_FILES_DIR" ]; then
+        echo -e "${GREEN}Repositório clonado/atualizado com sucesso em $DOCKER_FILES_DIR${NC}"
+        
+        # Navegar para o diretório e executar o script
+        cd "$DOCKER_FILES_DIR"
+        
+        if [ -f "start-docker.sh" ]; then
+            echo -e "${BLUE}Executando start-docker.sh...${NC}"
+            chmod +x start-docker.sh
+            ./start-docker.sh
+            echo -e "${GREEN}Script start-docker.sh executado com sucesso${NC}"
+        else
+            echo -e "${RED}Arquivo start-docker.sh não encontrado no repositório${NC}"
+            echo -e "${YELLOW}Arquivos no repositório:${NC}"
+            ls -la "$DOCKER_FILES_DIR"
+        fi
+    else
+        echo -e "${RED}Falha ao clonar o repositório docker-files${NC}"
+    fi
+    
+    echo -e "${GREEN}Configuração do docker-files concluída${NC}"
     pause
 fi
