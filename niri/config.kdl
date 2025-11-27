@@ -85,7 +85,7 @@ input {
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Layout
 layout {
   // Set gaps around windows in logical pixels.
-  gaps 5
+  gaps 0
   background-color "transparent"
   // When to center a column when changing focus, options are:
   // - "never", default behavior, focusing an off-screen column will keep at the left
@@ -256,7 +256,7 @@ window-rule {
   open-floating true
 }
 window-rule {
-  geometry-corner-radius 12
+  geometry-corner-radius 4
   clip-to-geometry true
 }
 binds {
@@ -441,6 +441,9 @@ binds {
   Mod+Shift+Equal { set-window-height "+10%"; }
 
   // === Screenshots ===
+  Mod+Shift+S hotkey-overlay-title="Screenshot Menu" {
+    spawn "~/.dots/script/screenshot.sh";
+  }
   XF86Launch1 { screenshot; }
   Ctrl+XF86Launch1 { screenshot-screen; }
   Alt+XF86Launch1 { screenshot-window; }
@@ -454,4 +457,3 @@ binds {
 debug {
   honor-xdg-activation-with-invalid-serial
 }
-

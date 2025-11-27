@@ -1,0 +1,81 @@
+/**
+ *
+ * Minimal crimson theme for Dunst action picker
+ *
+ * Uses the same palette as Waybar to keep UX consistent.
+ */
+
+@import "~/.dots/rofi/colors/spacecrimson.rasi"
+
+configuration {
+  font: "JetBrainsMono Nerd Font 11";
+  show-icons: false;
+}
+
+window {
+  transparency: "real";
+  location: center;
+  anchor: center;
+  width: 420px;
+  border: 0px solid;
+  border-radius: 12px;
+  padding: 12px;
+  background-color: @background;
+}
+
+mainbox {
+  padding: 6px;
+  spacing: 10px;
+}
+
+inputbar {
+  children: [ prompt, entry ];
+  padding: 4px 6px;
+  border: 0px solid;
+  border-radius: 8px;
+  background-color: @background-alt;
+}
+
+prompt {
+  padding: 0px 6px 0px 0px;
+  text-color: @active;
+}
+
+entry {
+  padding: 4px 0px;
+  text-color: @foreground;
+  expand: true;
+}
+
+listview {
+  columns: 1;
+  lines: 5;
+  fixed-height: false;
+  spacing: 6px;
+  scrollbar: false;
+  border: 0px;
+  background-color: transparent;
+}
+
+element {
+  padding: 8px 12px;
+  border: 0px solid;
+  border-radius: 6px;
+  background-color: @background-alt;
+  text-color: @foreground;
+}
+
+element selected {
+  background-color: @selected;
+  text-color: @background;
+}
+
+element urgent,
+element alternate {
+  background-color: transparent;
+}
+
+element urgent.selected {
+  background-color: @urgent;
+  text-color: @background;
+}

@@ -1,26 +1,29 @@
 // -*- mode: jsonc -*-
 {
-  "position": "bottom", // Waybar position (top|bottom|left|right)
-  "spacing": 4, // Gaps between modules (4px)
+  "position": "top", // Waybar position (top|bottom|left|right)
+  "height": 32, // Fixed height keeps bar compact on FHD 14\" and 1600x900 19.5\"
+  "spacing": 3, // Slightly tighter gaps between modules
   "modules-left": [
-    "group/hardware",
-    "tray",
     "custom/updates",
-    "privacy",
-    // "group/right",
+    "network",
+    "group/hardware",
+    "hyprland/workspaces",
     "sway/mode",
     "sway/scratchpad"
   ],
 
   "modules-center": [
-    "hyprland/workspaces",
+    "clock"
   ],
 
   "modules-right": [
+    "privacy",
+    "tray",
+    "custom/pomodoro",
+    "power-profiles-daemon",
     "group/settings",
     "bluetooth",
-    "clock",
-    "power-profiles-daemon",
+    "custom/dunst",
     "custom/power"
   ],
 
@@ -194,9 +197,7 @@
   "group/settings": {
     "orientation": "horizontal",
     "modules": [
-      "custom/dunst",
-      "pulseaudio",
-      "network"
+      "pulseaudio"
     ]
   },
   "custom/clipboard": {

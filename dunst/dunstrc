@@ -25,16 +25,16 @@
     icon_corners = all
     indicate_hidden = yes
 
-    ### Aparência Verde ###
+    ### Aparência Crimson ###
     transparency = 10
     separator_height = 2
     padding = 8
     horizontal_padding = 8
     text_icon_padding = 6
-    frame_width = 3
-    frame_color = "#4AC05B"
+    frame_width = 2
+    frame_color = "#ff5c78"
     gap_size = 0
-    separator_color = frame
+    separator_color = "#341018"
     sort = yes
     font = JetBrainsMono Nerd Font 10
     line_height = 0
@@ -61,7 +61,7 @@
     history_length = 20
 
     ### Misc/Advanced ###
-    dmenu = /usr/bin/rofi -dmenu -p dunst:
+    dmenu = ~/.dots/script/rofi-dunst-actions.sh -p dunst:
     browser = /usr/bin/xdg-open
     always_run_script = true
     title = Dunst
@@ -71,43 +71,43 @@
     ignore_dbusclose = false
     force_xwayland = false
     force_xinerama = false
+    actions = true
 
     ### Mouse ###
-    mouse_left_click = close_current
-    mouse_middle_click = do_action, close_current
+    mouse_left_click = do_action, close_current
+    mouse_middle_click = close_current
     mouse_right_click = close_all
 
 [experimental]
     per_monitor_dpi = false
 
-# Tema verde colors
-# Background: #282A36
-# Foreground: #F8F8F2
-# Verde: #4AC05B
-# Red: #FF5555
-# Yellow: #F1FA8C
-# Cyan: #8BE9FD
-# Green: #50FA7B
+# Tema crimson colors
+# Background: #0c0a16
+# Background alt: #1f0b12
+# Foreground: #fffbe6
+# Accent: #ff5c78
+# Urgent: #ff3b30
+# Calm: #f7b6c0
 
 [urgency_low]
-    background = "#282A36"
-    foreground = "#8BE9FD"
-    frame_color = "#6272A4"
+    background = "#0c0a16"
+    foreground = "#f7b6c0"
+    frame_color = "#2b0f19"
     timeout = 8
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#282A36"
-    foreground = "#F8F8F2"
-    frame_color = "#4AC05B"
+    background = "#0c0a16"
+    foreground = "#fffbe6"
+    frame_color = "#ff5c78"
     timeout = 10
     override_pause_level = 30
     default_icon = dialog-information
 
 [urgency_critical]
-    background = "#282A36"
-    foreground = "#FF5555"
-    frame_color = "#FF5555"
+    background = "#1f0b12"
+    foreground = "#ffe9e6"
+    frame_color = "#ff3b30"
     timeout = 0
     override_pause_level = 60
     default_icon = dialog-warning

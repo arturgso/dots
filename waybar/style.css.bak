@@ -1,15 +1,15 @@
-/* style.css - Tema Vermelho para Waybar */
+/* style.css – Tema Verde para Waybar */
 
 * {
   font-family: 'Noto Sans Mono', 'Font Awesome 6 Free', 'Font Awesome 6 Brands', monospace;
-  font-size: 12px;
-  color: #fffbe6;
+  font-size: 13px;
+  color: #e2e0e5;
 }
 
 /* Estilo geral da barra */
 window#waybar {
-  background-color: rgba(12, 10, 22, 0.92);
-  color: #fffbe6;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #e2e0e5;
 }
 
 window#waybar.hidden {
@@ -31,34 +31,16 @@ window#waybar.hidden {
 #keyboard-state,
 #sway-mode,
 #sway-scratchpad,
+#clock,
 #privacy,
 #tray,
 #bluetooth,
-#network,
-#custom-dunst,
 #custom-updates {
-  margin: 4px 2px;
-  padding: 0 10px 4px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid rgba(255, 92, 120, 0.8);
-  border-radius: 0;
-  color: #fffbe6;
-}
-
-#clock {
-  margin: 4px 10px;
-  padding: 0 12px 4px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #ff5c78;
-  border-radius: 0;
-  color: #fffbe6;
-}
-
-#privacy,
-#tray {
-  padding: 4px 8px;
+  margin: 8px 2px;
+  border-radius: 10;
+  background-color: #1a2a1a;
+  padding: 8px 12px;   
+  color: #e2e0e5;
 }
 
 #pulseaudio,
@@ -68,8 +50,8 @@ window#waybar.hidden {
 #battery,
 #idle_inhibitor,
 #custom-dunst {
-  margin-left: 6px;
-  margin-right: 6px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 /* #custom-clipboard, */
@@ -82,86 +64,86 @@ window#waybar.hidden {
 
 /* Estilo específico para os workspaces (container) */
 #workspaces {
-  padding: 0 3px;
+  background-color: #1a2a1a;
+  padding: 0 4px;
 }
 
 /* Botões de workspace */
 #workspaces button {
   background: transparent;
-  color: #f7b6c0;
+  color: #b8b5c0;
   min-width: 0;
-  transition: all 0.2s ease;
 }
 
 /* Destaque no workspace focado */
 #workspaces button.focused {
-  color: #ff7b94;
+  color: #4AC05B;
   font-weight: bold;
+  /* background-color: rgba(74, 192, 91, 0.5); */
 }
 
 /* Workspace visível (em outro monitor) */
 #workspaces button.visible {
-  color: #22070b;
-  background-color: #ff5c78;
-  padding: 0 14px;
-  border-radius: 8px;
+  color: #e2e0e5;
+  background-color: #4AC05B;
+  padding: 0 18px;
 }
 
 /* Workspace urgente */
 #workspaces button.urgent {
-  color: #fff4ec;
-  background-color: #ff3b30;
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.2);
 }
 
 /* Workspace vazio */
 #workspaces button.empty {
-  color: #c37a87;
-  opacity: 0.55;
+  color: #b8b5c0;
+  opacity: 0.5;
 }
 
 /* Hover simples */
 #workspaces button:hover {
-  background-color: rgba(255, 92, 120, 0.3);
-  color: #fffbe6;
+  background-color: rgba(74, 192, 91, 0.3);
+  color: #e2e0e5;
 }
 
 /* Estilos especiais de status */
 #battery.warning {
-  color: #ffd166;
+  color: #f1c40f;
 }
 #battery.critical {
-  color: #ff3b30;
+  color: #ff6b6b;
 }
 #temperature.critical {
-  color: #ffdd00;
+  color: #ff6b6b;
 }
 #pulseaudio.muted {
-  color: #c6bb83;
+  color: #b8b5c0;
   opacity: 0.7;
 }
 #network.disconnected {
-  color: #c6bb83;
+  color: #b8b5c0;
   opacity: 0.7;
 }
 
 #custom-pomodoro.work {
-  color: #ff5c78;
+  color: #00FF00;
 }
 #custom-pomodoro.break {
-  color: #64dfdf;
+  color: #FFAA00;
 }
 #custom-pomodoro.pause {
-  color: #a0a0a0;
+  color: #888888;
 }
 
 #battery.good {
-  color: #ff91a8;
+  color: #19B206;
 }
 
 #battery.warning {
-  color: #f0c969;
+  color: #FFC107;
 }
 
 #battery.critical {
-  color: #ff3b30;
+  color: #F44336;
 }

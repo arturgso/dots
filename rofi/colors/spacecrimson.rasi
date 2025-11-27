@@ -1,0 +1,16 @@
+/**
+ *
+ * Author : Artur Oliveira (arturgso)
+ * Github : @arturgso
+ *
+ * Colors inspired by the Waybar crimson theme
+ **/
+
+* {
+  background:     #0c0a16ff;
+  background-alt: #1f0b12f2;
+  foreground:     #fffbe6ff;
+  selected:       #ff5c78ff;
+  active:         #f7b6c0ff;
+  urgent:         #ff3b30ff;
+}
