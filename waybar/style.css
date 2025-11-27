@@ -1,15 +1,22 @@
-/* style.css - Tema Vermelho para Waybar */
+/* style.css - Tema baseado no esquema selecionado */
+
+@define-color theme_bg #0c0a16;
+@define-color theme_bg_alt #1f0b12;
+@define-color theme_fg #fffbe6;
+@define-color theme_accent #ff5c78;
+@define-color theme_active #f7b6c0;
+@define-color theme_urgent #ff3b30;
 
 * {
   font-family: 'Noto Sans Mono', 'Font Awesome 6 Free', 'Font Awesome 6 Brands', monospace;
   font-size: 12px;
-  color: #fffbe6;
+  color: @theme_fg;
 }
 
 /* Estilo geral da barra */
 window#waybar {
-  background-color: rgba(12, 10, 22, 0.92);
-  color: #fffbe6;
+  background-color: alpha(@theme_bg, 0.92);
+  color: @theme_fg;
 }
 
 window#waybar.hidden {
@@ -41,9 +48,9 @@ window#waybar.hidden {
   padding: 0 10px 4px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid rgba(255, 92, 120, 0.8);
+  border-bottom: 2px solid alpha(@theme_accent, 0.8);
   border-radius: 0;
-  color: #fffbe6;
+  color: @theme_fg;
 }
 
 #clock {
@@ -51,9 +58,9 @@ window#waybar.hidden {
   padding: 0 12px 4px;
   background: transparent;
   border: none;
-  border-bottom: 2px solid #ff5c78;
+  border-bottom: 2px solid @theme_accent;
   border-radius: 0;
-  color: #fffbe6;
+  color: @theme_fg;
 }
 
 #privacy,
@@ -88,80 +95,80 @@ window#waybar.hidden {
 /* Botões de workspace */
 #workspaces button {
   background: transparent;
-  color: #f7b6c0;
+  color: @theme_active;
   min-width: 0;
   transition: all 0.2s ease;
 }
 
 /* Destaque no workspace focado */
 #workspaces button.focused {
-  color: #ff7b94;
+  color: @theme_accent;
   font-weight: bold;
 }
 
 /* Workspace visível (em outro monitor) */
 #workspaces button.visible {
-  color: #22070b;
-  background-color: #ff5c78;
+  color: @theme_bg;
+  background-color: @theme_accent;
   padding: 0 14px;
   border-radius: 8px;
 }
 
 /* Workspace urgente */
 #workspaces button.urgent {
-  color: #fff4ec;
-  background-color: #ff3b30;
+  color: @theme_fg;
+  background-color: @theme_urgent;
 }
 
 /* Workspace vazio */
 #workspaces button.empty {
-  color: #c37a87;
+  color: @theme_active;
   opacity: 0.55;
 }
 
 /* Hover simples */
 #workspaces button:hover {
-  background-color: rgba(255, 92, 120, 0.3);
-  color: #fffbe6;
+  background-color: alpha(@theme_accent, 0.3);
+  color: @theme_fg;
 }
 
 /* Estilos especiais de status */
 #battery.warning {
-  color: #ffd166;
+  color: @theme_active;
 }
 #battery.critical {
-  color: #ff3b30;
+  color: @theme_urgent;
 }
 #temperature.critical {
-  color: #ffdd00;
+  color: @theme_urgent;
 }
 #pulseaudio.muted {
-  color: #c6bb83;
+  color: alpha(@theme_fg, 0.7);
   opacity: 0.7;
 }
 #network.disconnected {
-  color: #c6bb83;
+  color: alpha(@theme_fg, 0.7);
   opacity: 0.7;
 }
 
 #custom-pomodoro.work {
-  color: #ff5c78;
+  color: @theme_accent;
 }
 #custom-pomodoro.break {
-  color: #64dfdf;
+  color: @theme_active;
 }
 #custom-pomodoro.pause {
-  color: #a0a0a0;
+  color: alpha(@theme_fg, 0.6);
 }
 
 #battery.good {
-  color: #ff91a8;
+  color: @theme_active;
 }
 
 #battery.warning {
-  color: #f0c969;
+  color: @theme_active;
 }
 
 #battery.critical {
-  color: #ff3b30;
+  color: @theme_urgent;
 }

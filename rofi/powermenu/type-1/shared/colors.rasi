@@ -15,4 +15,4 @@
 
 /* Import color-scheme from `colors` directory */
 
-@import "~/.dots/rofi/colors/nebula.rasi"
+@import "~/.dots/rofi/colors/spacecrimson.rasi"

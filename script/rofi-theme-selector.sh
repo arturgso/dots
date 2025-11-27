@@ -27,6 +27,8 @@ mapfile -t THEMES < <(
   done | sort -f
 )
 
+declare -A PALETTE=()
+
 extract_color() {
   local file="$1" key="$2" value=""
   if command -v rg >/dev/null 2>&1; then
@@ -102,6 +104,110 @@ select_theme() {
   return 1
 }
 
+load_palette() {
+  local theme="$1"
+  local file="${COLORS_DIR}/${theme}.rasi"
+  if [[ ! -f "$file" ]]; then
+    echo "Arquivo de cores não encontrado: $file" >&2
+    exit 1
+  fi
+
+  for key in background background-alt foreground selected active urgent; do
+    PALETTE["$key"]="$(extract_color "$file" "$key")"
+  done
+}
+
+update_waybar() {
+  local file="${DOTS_DIR}/waybar/style.css"
+  if [[ ! -f "$file" ]]; then
+    echo "Waybar não encontrado, pulando atualização."
+    return
+  fi
+
+  declare -A map=(
+    [theme_bg]="background"
+    [theme_bg_alt]="background-alt"
+    [theme_fg]="foreground"
+    [theme_accent]="selected"
+    [theme_active]="active"
+    [theme_urgent]="urgent"
+  )
+
+  for var in "${!map[@]}"; do
+    local key="${map[$var]}"
+    local color="${PALETTE[$key]}"
+    [[ -n "$color" ]] || continue
+    WAYBAR_VAR="$var" WAYBAR_COLOR="$color" perl -0pi -e '
+      my $var = quotemeta($ENV{"WAYBAR_VAR"});
+      my $color = $ENV{"WAYBAR_COLOR"};
+      $color =~ s/^#//;
+      s|(@define-color\s+$var\s+)#[0-9A-Fa-f]{6}|$1#$color|g;
+    ' "$file"
+  done
+
+  printf 'Atualizado Waybar: %s\n' "$file"
+}
+
+update_dunst() {
+  local file="${DOTS_DIR}/dunst/dunstrc"
+  if [[ ! -f "$file" ]]; then
+    echo "Arquivo do Dunst não encontrado, pulando atualização."
+    return
+  fi
+
+  declare -A map=(
+    [background]="background"
+    [background-alt]="background-alt"
+    [foreground]="foreground"
+    [accent]="selected"
+    [active]="active"
+    [urgent]="urgent"
+  )
+
+  for tag in "${!map[@]}"; do
+    local key="${map[$tag]}"
+    local color="${PALETTE[$key]}"
+    [[ -n "$color" ]] || continue
+    THEME_TAG="$tag" THEME_COLOR="$color" perl -0pi -e '
+      my $tag = quotemeta($ENV{"THEME_TAG"});
+      my $color = $ENV{"THEME_COLOR"};
+      s{(=\s*)"#[0-9A-Fa-f]{6}"(\s*#\s*theme:$tag(?:\s|$))}{$1"$color"$2}g;
+    ' "$file"
+  done
+
+  printf 'Atualizado Dunst: %s\n' "$file"
+}
+
+restart_dunst() {
+  if ! command -v dunst >/dev/null 2>&1; then
+    echo "dunst não está no PATH; não foi reiniciado."
+    return
+  fi
+
+  pkill -x dunst >/dev/null 2>&1 || true
+  sleep 0.2
+  nohup dunst >/dev/null 2>&1 &
+  sleep 0.2
+
+  if command -v dunstify >/dev/null 2>&1; then
+    dunstify "Tema aplicado" "Novo esquema: ${1}" >/dev/null 2>&1 || \
+      echo "Não foi possível enviar notificação de teste do Dunst." >&2
+  fi
+  echo "Dunst reiniciado."
+}
+
+restart_waybar() {
+  if ! command -v waybar >/dev/null 2>&1; then
+    echo "Waybar não está no PATH; não foi reiniciado."
+    return
+  fi
+
+  pkill -x waybar >/dev/null 2>&1 || true
+  sleep 0.2
+  nohup waybar >/dev/null 2>&1 &
+  echo "Waybar reiniciado."
+}
+
 gather_target_files() {
   if command -v rg >/dev/null 2>&1; then
     rg -l --no-heading '@import[^\n]*rofi/colors' "$ROFI_DIR"
@@ -137,4 +243,9 @@ if [[ -z "$selected_theme" ]]; then
   exit 0
 fi
 
+load_palette "$selected_theme"
 apply_theme "$selected_theme"
+update_waybar
+update_dunst
+restart_waybar
+restart_dunst "$selected_theme"

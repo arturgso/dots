@@ -32,9 +32,9 @@
     horizontal_padding = 8
     text_icon_padding = 6
     frame_width = 2
-    frame_color = "#ff5c78"
+    frame_color = "#ff5c78"         # theme:accent
     gap_size = 0
-    separator_color = "#341018"
+    separator_color = "#1f0b12"     # theme:background-alt
     sort = yes
     font = JetBrainsMono Nerd Font 10
     line_height = 0
@@ -81,33 +81,27 @@
 [experimental]
     per_monitor_dpi = false
 
-# Tema crimson colors
-# Background: #0c0a16
-# Background alt: #1f0b12
-# Foreground: #fffbe6
-# Accent: #ff5c78
-# Urgent: #ff3b30
-# Calm: #f7b6c0
+# Paleta controlada pelo script ~/.dots/script/rofi-theme-selector.sh
 
 [urgency_low]
-    background = "#0c0a16"
-    foreground = "#f7b6c0"
-    frame_color = "#2b0f19"
+    background = "#0c0a16"          # theme:background
+    foreground = "#f7b6c0"          # theme:active
+    frame_color = "#1f0b12"         # theme:background-alt
     timeout = 8
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#0c0a16"
-    foreground = "#fffbe6"
-    frame_color = "#ff5c78"
+    background = "#0c0a16"          # theme:background
+    foreground = "#fffbe6"          # theme:foreground
+    frame_color = "#ff5c78"         # theme:accent
     timeout = 10
     override_pause_level = 30
     default_icon = dialog-information
 
 [urgency_critical]
-    background = "#1f0b12"
-    foreground = "#ffe9e6"
-    frame_color = "#ff3b30"
+    background = "#1f0b12"          # theme:background-alt
+    foreground = "#fffbe6"          # theme:foreground
+    frame_color = "#ff3b30"         # theme:urgent
     timeout = 0
     override_pause_level = 60
     default_icon = dialog-warning
