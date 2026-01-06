@@ -5,7 +5,7 @@
  * Uses the same palette as Waybar to keep UX consistent.
  */
 
-@import "~/.dots/rofi/colors/spacelime.rasi"
+@import "~/.dots/rofi/colors/nocturne.rasi"
 
 configuration {
   font: "JetBrainsMono Nerd Font 11";

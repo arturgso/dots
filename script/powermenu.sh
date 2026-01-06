@@ -68,8 +68,15 @@ run_cmd() {
       systemctl suspend
       ;;
     --logout)
-      # hyprctl dispatch exit 0
-      niri msg action quit
+      if command -v hyprctl &>/dev/null && [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then
+        hyprctl dispatch exit 0
+      elif command -v niri &>/dev/null; then
+        niri msg action quit
+      elif command -v swaymsg &>/dev/null; then
+        swaymsg exit
+      else
+        notify-send "Nenhum compositor suportado encontrado para logout."
+      fi
       ;;
     esac
   else

@@ -16,4 +16,4 @@
 
 /* Import color-scheme from `colors` directory */
 
-@import "~/.dots/rofi/colors/spacelime.rasi"
+@import "~/.dots/rofi/colors/nocturne.rasi"
