@@ -178,6 +178,53 @@ update_dunst() {
   printf 'Atualizado Dunst: %s\n' "$file"
 }
 
+update_hyprland() {
+  local file="${DOTS_DIR}/hypr/conf.d/look-and-feel.conf"
+  if [[ ! -f "$file" ]]; then
+    echo "Arquivo do Hyprland não encontrado, pulando atualização."
+    return
+  fi
+
+  local active="${PALETTE[selected]}"
+  local inactive="${PALETTE[background-alt]}"
+  
+  if [[ -z "$active" ]] || [[ -z "$inactive" ]]; then
+    echo "Cores para bordas do Hyprland não encontradas."
+    return
+  fi
+
+  # Converter hex para rgba (formato Hyprland)
+  local active_hex="${active#\#}"
+  local inactive_hex="${inactive#\#}"
+  
+  # Substituir col.active_border
+  HYPR_COLOR="rgba(${active_hex}FF)" perl -0pi -e '
+    my $color = $ENV{"HYPR_COLOR"};
+    s{(col\.active_border\s*=\s*)rgba\([0-9A-Fa-f]{6,8}(?:FF)?\)(?:\s+rgba\([0-9A-Fa-f]{6,8}(?:FF)?\)\s+\d+deg)?}{$1$color}g;
+  ' "$file"
+
+  # Substituir col.inactive_border
+  HYPR_COLOR="rgba(${inactive_hex}aa)" perl -0pi -e '
+    my $color = $ENV{"HYPR_COLOR"};
+    s{(col\.inactive_border\s*=\s*)rgba\([0-9A-Fa-f]{6,8}[0-9a-fA-F]{0,2}\)}{$1$color}g;
+  ' "$file"
+
+  printf 'Atualizado Hyprland: %s\n' "$file"
+}
+
+reload_hyprland() {
+  if ! command -v hyprctl >/dev/null 2>&1; then
+    echo "hyprctl não está no PATH; configuração do Hyprland não foi recarregada."
+    return
+  fi
+
+  if hyprctl reload >/dev/null 2>&1; then
+    echo "Configuração do Hyprland recarregada."
+  else
+    echo "Erro ao recarregar configuração do Hyprland." >&2
+  fi
+}
+
 restart_dunst() {
   if ! command -v dunst >/dev/null 2>&1; then
     echo "dunst não está no PATH; não foi reiniciado."
@@ -247,5 +294,7 @@ load_palette "$selected_theme"
 apply_theme "$selected_theme"
 update_waybar
 update_dunst
+update_hyprland
 restart_waybar
 restart_dunst "$selected_theme"
+reload_hyprland
