@@ -16,4 +16,4 @@
 
 /* Import color-scheme from `colors` directory */
 
-@import "~/.dots/rofi/colors/nocturne.rasi"
+@import "~/.dots/rofi/colors/wallpaper.rasi"

@@ -1,11 +1,11 @@
 /* style.css - Tema baseado no esquema selecionado */
 
-@define-color theme_bg #0C101B;
-@define-color theme_bg_alt #141B29;
-@define-color theme_fg #E4E9FF;
-@define-color theme_accent #5567D9;
-@define-color theme_active #3BC8AF;
-@define-color theme_urgent #FF6B81;
+@define-color theme_bg #162b4a;
+@define-color theme_bg_alt #F4AE4C;
+@define-color theme_fg #c4cad1;
+@define-color theme_accent #4474AF;
+@define-color theme_active #FDCE66;
+@define-color theme_urgent #F4AE4C;
 
 * {
   font-family: 'Noto Sans Mono', 'Font Awesome 6 Free', 'Font Awesome 6 Brands', monospace;

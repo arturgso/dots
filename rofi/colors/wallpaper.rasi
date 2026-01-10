@@ -1,0 +1,14 @@
+/* ────────────────────────────────────────────────────────────────────────────
+ * Tema gerado automaticamente a partir do papel de parede
+ * Arquivo: /home/vexis/.default.png
+ * Gerado em: 2026-01-08 22:23:50
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+* {
+    background:     #162b4a;
+    background-alt: #F4AE4C;
+    foreground:     #c4cad1;
+    selected:       #4474AF;
+    active:         #FDCE66;
+    urgent:         #F4AE4C;
+}
