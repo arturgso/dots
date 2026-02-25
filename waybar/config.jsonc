@@ -17,14 +17,12 @@
   ],
 
   "modules-right": [
-    "privacy",
-    "tray",
-    "custom/pomodoro",
-    "power-profiles-daemon",
-    "group/settings",
     "network",
     "bluetooth",
+    "pulseaudio",
+    "custom/updates",
     "custom/dunst",
+    "tray",
     "custom/power"
   ],
 
@@ -72,7 +70,7 @@
 
 
   "clock": {
-    "format": "{:%a, %d %b %H:%M}",
+    "format": "{:%H:%M}",
     "tooltip-format": "{calendar}"
   },
   "cpu": {
@@ -152,12 +150,12 @@
   },
   "network": {
     // "interface": "wlp2*", // (Optional) To force the use of this interface
-    "format-wifi": " {essid}",
+    "format-wifi": " {signalStrength}%",
     "on-click": "kitty --detach -- bash -c 'nmtui'",
-    "format-ethernet": "{ipaddr}/{cidr} ",
-    "tooltip-format": "{ifname} via {gwaddr} ",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "Disconnected ⚠",
+    "format-ethernet": "󰈀",
+    "tooltip-format": "{ifname} • {ipaddr}/{cidr}\nGW: {gwaddr}",
+    "format-linked": "󰈀",
+    "format-disconnected": "󰖪",
     // "format-alt": "{ifname}: {ipaddr}/{cidr}"
   },
   "pulseaudio": {
@@ -193,12 +191,6 @@
       // "cpu",
       "memory",
       "battery"
-    ]
-  },
-  "group/settings": {
-    "orientation": "horizontal",
-    "modules": [
-      "pulseaudio"
     ]
   },
   "custom/clipboard": {
