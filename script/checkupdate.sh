@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if command -v pacman >/dev/null 2>&1; then
+    exec "$HOME/.dots/script/checkupdate-arch.sh"
+fi
+
 # Verificar atualizações do DNF
 dnf_updates=$(dnf check-update --refresh -yq 2>/dev/null | tail -n +2 | grep -E 'x86_64|i686|noarch|aarch64' | awk '{print $1,$2}')
 dnf_count=$(echo "$dnf_updates" | grep -c .)  # Conta linhas não vazias

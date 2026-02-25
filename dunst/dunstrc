@@ -32,9 +32,9 @@
     horizontal_padding = 8
     text_icon_padding = 6
     frame_width = 2
-    frame_color = "#4474AF"         # theme:accent
+    frame_color = "#33467C"         # theme:accent
     gap_size = 0
-    separator_color = "#F4AE4C"     # theme:background-alt
+    separator_color = "#1A1B26"     # theme:background-alt
     sort = yes
     font = JetBrainsMono Nerd Font 10
     line_height = 0
@@ -84,24 +84,24 @@
 # Paleta controlada pelo script ~/.dots/script/rofi-theme-selector.sh
 
 [urgency_low]
-    background = "#162b4a"          # theme:background
-    foreground = "#FDCE66"          # theme:active
-    frame_color = "#F4AE4C"         # theme:background-alt
+    background = "#15161E"          # theme:background
+    foreground = "#414868"          # theme:active
+    frame_color = "#1A1B26"         # theme:background-alt
     timeout = 8
     default_icon = dialog-information
 
 [urgency_normal]
-    background = "#162b4a"          # theme:background
-    foreground = "#c4cad1"          # theme:foreground
-    frame_color = "#4474AF"         # theme:accent
+    background = "#15161E"          # theme:background
+    foreground = "#C0CAF5"          # theme:foreground
+    frame_color = "#33467C"         # theme:accent
     timeout = 10
     override_pause_level = 30
     default_icon = dialog-information
 
 [urgency_critical]
-    background = "#F4AE4C"          # theme:background-alt
-    foreground = "#c4cad1"          # theme:foreground
-    frame_color = "#F4AE4C"         # theme:urgent
+    background = "#1A1B26"          # theme:background-alt
+    foreground = "#C0CAF5"          # theme:foreground
+    frame_color = "#F7768E"         # theme:urgent
     timeout = 0
     override_pause_level = 60
     default_icon = dialog-warning

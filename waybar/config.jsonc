@@ -4,7 +4,8 @@
   "height": 32, // Fixed height keeps bar compact on FHD 14\" and 1600x900 19.5\"
   "spacing": 3, // Slightly tighter gaps between modules
   "modules-left": [
-    "custom/updates",
+	"hyprland/workspaces",
+    //"custom/updates",
     // "network",
     "group/hardware",
     "sway/mode",
@@ -21,6 +22,7 @@
     "custom/pomodoro",
     "power-profiles-daemon",
     "group/settings",
+    "network",
     "bluetooth",
     "custom/dunst",
     "custom/power"
@@ -268,9 +270,9 @@
     "tooltip": false
   },
   "custom/updates": {
-    "exec": "~/.dots/script/checkupdate.sh",
-    "on-click-right": "~/.dots/script/checkupdate.sh",
-    "on-click-middle": "niri msg action spawn -- kitty -e sudo dnf update --refresh && flatpak update -y",
+    "exec": "~/.dots/script/checkupdate-arch.sh",
+    "on-click-right": "~/.dots/script/checkupdate-arch.sh",
+    "on-click-middle": "kitty -e bash -lc 'sudo pacman -Syu && flatpak update -y'",
     "interval": "9000",
     "return-type": "json",
     "format": "{icon} {text}",

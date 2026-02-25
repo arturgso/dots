@@ -1,11 +1,11 @@
 /* style.css - Tema baseado no esquema selecionado */
 
-@define-color theme_bg #162b4a;
-@define-color theme_bg_alt #F4AE4C;
-@define-color theme_fg #c4cad1;
-@define-color theme_accent #4474AF;
-@define-color theme_active #FDCE66;
-@define-color theme_urgent #F4AE4C;
+@define-color theme_bg #15161E;
+@define-color theme_bg_alt #1A1B26;
+@define-color theme_fg #C0CAF5;
+@define-color theme_accent #33467C;
+@define-color theme_active #414868;
+@define-color theme_urgent #F7768E;
 
 * {
   font-family: 'Noto Sans Mono', 'Font Awesome 6 Free', 'Font Awesome 6 Brands', monospace;
@@ -89,46 +89,49 @@ window#waybar.hidden {
 
 /* Estilo específico para os workspaces (container) */
 #workspaces {
-  padding: 0 3px;
+  padding: 0 4px;
 }
 
 /* Botões de workspace */
 #workspaces button {
-  background: transparent;
-  color: @theme_active;
+  margin: 0 2px;
+  padding: 0 8px;
   min-width: 0;
-  transition: all 0.2s ease;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  background: transparent;
+  color: alpha(@theme_fg, 0.55);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Destaque no workspace focado */
 #workspaces button.focused {
-  color: @theme_accent;
-  font-weight: bold;
+  background: alpha(@theme_accent, 0.3);
+  color: @theme_fg;
+  font-weight: 600;
 }
 
 /* Workspace visível (em outro monitor) */
 #workspaces button.visible {
-  color: @theme_bg;
-  background-color: @theme_accent;
-  padding: 0 14px;
-  border-radius: 8px;
+  background: alpha(@theme_active, 0.35);
+  color: alpha(@theme_fg, 0.9);
 }
 
 /* Workspace urgente */
 #workspaces button.urgent {
-  color: @theme_fg;
-  background-color: @theme_urgent;
+  background: alpha(@theme_urgent, 0.9);
+  color: @theme_bg;
 }
 
 /* Workspace vazio */
 #workspaces button.empty {
-  color: @theme_active;
-  opacity: 0.55;
+  color: alpha(@theme_fg, 0.35);
 }
 
 /* Hover simples */
 #workspaces button:hover {
-  background-color: alpha(@theme_accent, 0.3);
+  background: alpha(@theme_accent, 0.2);
   color: @theme_fg;
 }
 

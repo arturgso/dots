@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
-awww_bin="$HOME/.cargo/bin/awww"
-awww_daemon="$HOME/.cargo/bin/awww-daemon"
+awww_bin="$(command -v awww || true)"
+awww_daemon_bin="$(command -v awww-daemon || true)"
+
+if [[ -z "$awww_bin" || -z "$awww_daemon_bin" ]]; then
+  echo "awww/awww-daemon não encontrados no PATH." >&2
+  exit 1
+fi
 
 shopt -s nullglob
 default_image=""
@@ -21,8 +26,9 @@ if [[ -z $default_image ]]; then
   exit 1
 fi
 
-"$awww_daemon" &
-
-sleep 0.5
+if ! pgrep -x awww-daemon >/dev/null 2>&1; then
+  "$awww_daemon_bin" >/dev/null 2>&1 &
+  sleep 0.5
+fi
 
 "$awww_bin" img "$default_image"
